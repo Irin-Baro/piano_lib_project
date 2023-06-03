@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Профайл автора {{ author.author_name }}
+{% endblock %}
+
+{% block content %} 
+  <div class="mb-5">     
+    <h1>Все песни автора {{ author.author_name }} </h1>
+    <h4>Всего песен: {{ author.songs.count }}</h4>
+    <h6>{{ author.description }}</h6>
+    {% include 'songs/includes/image.html'%}
+   
+  </div>
+  {% for song in songs %}
+    {% include 'songs/includes/article.html' with profile=True %}
+    {% if not forloop.last %}<hr>{% endif %}
+  {% endfor %}
+
+  {% include 'songs/includes/paginator.html' %}
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Редактировать комментарий{% endblock %}
+{% block content %}
+  {% with card_header='Редактировать комментарий' button='Сохранить комментарий' %}
+    {% include 'includes/form.html' %}
+  {% endwith %}
+{% endblock %}

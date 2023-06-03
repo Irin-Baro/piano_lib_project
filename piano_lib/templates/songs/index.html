@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load cache %}
+
+{% block title %}
+  Главная
+{% endblock %}
+
+{% block content %}
+<h1>Главная</h1>
+  {% cache 20 article page_obj.number %}
+    {% for song in songs %}
+      {% include 'songs/includes/article.html' %}
+      {% if not forloop.last %}<hr>{% endif %}
+    {% endfor %}
+    {% include 'songs/includes/paginator.html' %}
+  {% endcache %}
+{% endblock %}

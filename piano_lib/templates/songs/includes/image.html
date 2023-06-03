@@ -1,0 +1,5 @@
+{% load thumbnail %}
+
+{% thumbnail author.image "960x500" crop="center" upscale=True as im %}
+  <img class="card-img my-2" src="{{ im.url }}">
+{% endthumbnail %}

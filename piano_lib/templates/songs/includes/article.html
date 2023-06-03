@@ -1,0 +1,26 @@
+<article>
+  <div class="shadow-sm p-3 bg-white">
+  <ul>
+    {% if not profile %}
+    <li>
+      Автор: <b>{{ song.author.get_full_name }}</b>
+      <a href="{% url 'songs:profile' song.author_id %}">{{ song.author }}</a>
+    </li>
+    {% endif %}
+    <li>
+      Дата публикации: {{ song.pub_date|date:"d E Y" }}
+    </li>
+    {% if song.category %} 
+      <li> 
+        Категория: 
+      <a href="{% url 'songs:category_list' song.category.slug %}">{{ song.category.category_title }}</a>
+      </li>
+    {% endif %}
+  </ul>
+
+  <p>{{ song.song_title }}</p>
+  <a href="{% url 'songs:song_detail' song.id %}">подробнее</a>
+ 
+  {% include 'songs/includes/song_counters.html' %}
+</div>
+</article>

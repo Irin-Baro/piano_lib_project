@@ -1,0 +1,34 @@
+<div class="d-flex justify-content-between align-items-center mb-3 ml-2">
+  <div class="row my-3">
+    <div class="btn-group text-muted  btn-sm "> 
+      <div class="d-flex justify-content-between align-items-center mb-3 ml-2">
+         
+        <div class="btn-group text-muted  btn-sm">
+          {% if song_detail %}
+            {% if is_liked %}
+              <a class="nav-link" href="{% url 'songs:song_dislike' song.author.username song.id %}" role='button'>
+                ❤️{{ song.like.count }} {% if likes.number == 0 or None %} 0 {% endif %}
+              </a>
+            {% else %}
+              <a class="nav-link" href="{% url 'songs:song_like' song.author song.id %}" role='button'>
+                🤍{{ song.like.count }} {% if likes.number == 0 or None %} 0 {% endif %}
+              </a>
+              {% endif %}
+          {% else %}
+            <div class="btn-group text-muted  btn-sm ">
+              💕 {{ song.like.count }} {% if likes.number == 0 or None %} 0 {% endif %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-between align-items-right mr-2">
+          <div class="btn-group text-muted  btn-sm ">Просмотров: {{ song.count_views }}</div>
+        </div>
+
+        <div class="btn-group text-muted  btn-sm ">
+          <a class="nav-link" href="{% url 'songs:add_comment' song.id %}">💬 {{ song.comments.count }}</a>
+        </div>
+      </div> 
+    </div>
+  </div>
+</div>
