@@ -7,12 +7,12 @@ app_name = 'songs'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    # path('songs/', views.songs, name='song_list'),
+    path('favorites/', views.favorites_index, name='favorites_index'),
     path('category/<slug:slug>/', views.category_list, name='category_list'),
     path('profile/<int:author_id>/', views.profile, name='profile'),
     path('songs/<int:song_id>', views.song_detail, name='song_detail'),
     path(
-        'songs/<int:songs_id>/comment/', views.add_comment,
+        'songs/<int:song_id>/comment/', views.add_comment,
         name='add_comment'
     ),
     path(
@@ -35,4 +35,7 @@ urlpatterns = [
         views.song_dislike,
         name='song_dislike'
     ),
+    path('songs/<int:song_id>/download/',
+         views.song_download,
+         name='song_download'),
 ]

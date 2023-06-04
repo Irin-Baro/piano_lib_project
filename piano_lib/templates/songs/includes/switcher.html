@@ -4,17 +4,17 @@
       <li class="nav-item">
         <a 
           class="nav-link {% if index %}active{% endif %}"
-          href="{% url 'posts:index' %}"
+          href="{% url 'songs:index' %}"
         >
-          Все авторы
+          Все песни
         </a>
       </li>
       <li class="nav-item">
         <a 
-           class="nav-link {% if follow %}active{% endif %}"
-           href="{% url 'posts:follow_index' %}"
+           class="nav-link {% if favorites %}active{% endif %}"
+           href="{% url 'songs:favorites_index' %}"
         >
-          Избранные авторы
+          Избранные песни
         </a>
       </li>
     </ul>

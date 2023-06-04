@@ -17,7 +17,7 @@
     <div class="media-body">
       <div class="alert alert-primary" role="alert">
         {{ comment.created|date:'d E Y' }}
-        <a href="{% url 'songs:profile' comment.author.username %}">{{ comment.author.get_full_name }}</a>:
+        {{ comment.author.get_full_name }}</a>:
       </div>
       <figure>
         <blockquote class="blockquote">

@@ -12,7 +12,7 @@
     {% include 'songs/includes/image.html'%}
    
   </div>
-  {% for song in songs %}
+  {% for song in page_obj %}
     {% include 'songs/includes/article.html' with profile=True %}
     {% if not forloop.last %}<hr>{% endif %}
   {% endfor %}

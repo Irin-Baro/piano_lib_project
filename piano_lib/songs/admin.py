@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Author, Song, Category, Comment, Like, SongCountViews
+from .models import Author, Song, Category, Comment, Like  # , SongCountViews
 
 
 @admin.register(Song)
@@ -9,11 +9,17 @@ class SongAdmin(admin.ModelAdmin):
         'song_title',
         'author',
         'category',
+        'description',
         'pub_date',
         'song_file',
-
     )
-    list_editable = ('author', 'category', 'song_file', 'song_title')
+    list_editable = (
+        'author',
+        'category',
+        'song_file',
+        'song_title',
+        'description'
+    )
     search_fields = ('song_title', 'category', 'author', 'pub_date')
     list_filter = ('pub_date', 'category', 'author',)
     empty_value_display = '-пусто-'
@@ -43,4 +49,4 @@ class CommentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Like)
-admin.site.register(SongCountViews)
+# admin.site.register(SongCountViews)

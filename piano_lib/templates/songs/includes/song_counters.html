@@ -6,7 +6,7 @@
         <div class="btn-group text-muted  btn-sm">
           {% if song_detail %}
             {% if is_liked %}
-              <a class="nav-link" href="{% url 'songs:song_dislike' song.author.username song.id %}" role='button'>
+              <a class="nav-link" href="{% url 'songs:song_dislike' song.author.author_name song.id %}" role='button'>
                 ❤️{{ song.like.count }} {% if likes.number == 0 or None %} 0 {% endif %}
               </a>
             {% else %}

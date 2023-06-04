@@ -95,9 +95,18 @@ class Song(models.Model):
         upload_to='songs/',
         blank=True
     )
+    description = models.TextField(
+        blank=True,
+        verbose_name='Информация о песни',
+        help_text='Укажите информацию о песни'
+    )
     count_views = models.PositiveIntegerField(
         default=0,
         verbose_name='Количество просмотров песни'
+    )
+    count_likes = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Количество лайков песни'
     )
 
     class Meta:
@@ -147,7 +156,7 @@ class Like(models.Model):
         related_name='liker',
         verbose_name='Лайкер'
     )
-    post = models.ForeignKey(
+    song = models.ForeignKey(
         Song,
         on_delete=models.CASCADE,
         related_name='like'
@@ -157,25 +166,11 @@ class Like(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Нравится'
-        verbose_name_plural = 'Нравятся'
-
-
-class SongCountViews(models.Model):
-    # привязка к пользователю (сессии пользователя)
-    sesId = models.CharField(
-        max_length=150,
-        db_index=True
-    )
-    # привязка к посту
-    songId = models.ForeignKey(
-        Song,
-        blank=True,
-        null=True,
-        default=None,
-        on_delete=models.CASCADE
-    )
-
-    class Meta:
-        verbose_name = 'Просмотр'
-        verbose_name_plural = 'Количество просмотров'
+        constraints = (
+            models.UniqueConstraint(
+                fields=['user', 'song'],
+                name='unique_favorites'
+            ),
+        )
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные'
