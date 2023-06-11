@@ -10,7 +10,7 @@ urlpatterns = [
     path('favorites/', views.favorites_index, name='favorites_index'),
     path('category/<slug:slug>/', views.category_list, name='category_list'),
     path('profile/<int:author_id>/', views.profile, name='profile'),
-    path('songs/<int:song_id>', views.song_detail, name='song_detail'),
+    path('songs/<int:song_id>/', views.song_detail, name='song_detail'),
     path(
         'songs/<int:song_id>/comment/', views.add_comment,
         name='add_comment'
@@ -26,14 +26,9 @@ urlpatterns = [
         name='delete_comment'
     ),
     path(
-        'songs/<str:username>/<int:song_id>/like/',
-        views.song_like,
-        name='song_like'
-    ),
-    path(
-        'songs/<str:username>/<int:song_id>/dislike/',
-        views.song_dislike,
-        name='song_dislike'
+        'songs/<int:content_type_id>/<int:object_id>/like',
+        views.like_toggle,
+        name='like_toggle'
     ),
     path('songs/<int:song_id>/download/',
          views.song_download,

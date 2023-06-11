@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Author, Song, Category, Comment, Like  # , SongCountViews
+from .models import Author, Song, Category, Comment, Like, SongCountViews
 
 
 @admin.register(Song)
@@ -49,4 +49,4 @@ class CommentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Like)
-# admin.site.register(SongCountViews)
+admin.site.register(SongCountViews)

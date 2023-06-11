@@ -22,7 +22,10 @@
       <figure>
         <blockquote class="blockquote">
           <div class="shadow-sm p-3 bg-white">
+
             {{ comment.text|linebreaks }}
+              {% include 'songs/includes/likes/comment_likes.html' %}
+             
             {% if request.user == comment.author %}
               <a class="btn btn-primary" href="{% url 'songs:delete_comment' comment.pk %}">
                 Удалить комментарий

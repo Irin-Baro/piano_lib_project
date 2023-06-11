@@ -1,11 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http.response import FileResponse
 
 from .models import (Author, Song, Category,
-                     Comment, Like)
+                     Comment, Like, SongCountViews)
 from .forms import CommentForm
 
 
@@ -57,20 +58,22 @@ def song_detail(request, song_id):
     song = get_object_or_404(
         Song.objects.select_related('author', 'category'), pk=song_id)
     comments = song.comments.select_related('author')
-    is_liked = (
-        request.user.is_authenticated
-        and song.like.filter(user_id=request.user))
+    if not request.session.session_key:
+        request.session.save()
+    session_key = request.session.session_key
+    is_views = SongCountViews.objects.filter(songId=song.id, sesId=session_key)
+    if is_views.count() == 0 and str(session_key) != 'None':
+        views = SongCountViews()
+        views.sesId = session_key
+        views.songId = song
+        views.save()
+        song.count_views += 1
+        song.save()
     context = {
         'song': song,
         'comments': comments,
         'form': CommentForm(),
-        'is_liked': is_liked,
     }
-    if 'song_id' not in request.COOKIES:
-        response = render(request, 'songs/song_detail.html', context)
-        response.set_cookie('song_id', song.id, max_age=60*60*24)
-        song.count_views += 1
-        song.save()
     return render(request, 'songs/song_detail.html', context)
 
 
@@ -128,27 +131,51 @@ def delete_comment(request, comment_id):
 
 
 @login_required
-def song_like(request, username, song_id):
-    """Функция добавления песни в избранное"""
-    song = get_object_or_404(Song, author__author_name=username, pk=song_id)
-    Like.objects.get_or_create(user=request.user, song=song)
-    return redirect('songs:song_detail', song_id=song_id)
-
-
-@login_required
-def song_dislike(request, username, song_id):
-    """Функция удаления песни из избранных"""
-    song = get_object_or_404(Song, author__author_name=username, pk=song_id)
-    Like.objects.filter(user=request.user, song=song).delete()
-    return redirect('songs:song_detail', song_id=song_id)
+def like_toggle(request, content_type_id, object_id):
+    content_type = ContentType.objects.get_for_id(content_type_id)
+    obj = get_object_or_404(content_type.model_class(), id=object_id)
+    like, created = Like.objects.get_or_create(
+        content_type=content_type,
+        object_id=obj.id,
+        user=request.user)
+    if not created:
+        was_liked = like.liked
+        like.liked = not like.liked
+        if was_liked:
+            obj.likes.remove(like)
+        else:
+            obj.likes.add(like)
+        like.save()
+        obj.save()
+    return redirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
 def favorites_index(request):
     """Страница избранных песен"""
     page_obj = paginator(
-        Song.objects.select_related('author', 'category')
-        .filter(like__user_id=request.user),
+        Song.objects.filter(likes__user=request.user, likes__liked=True),
         request.GET.get('page')
     )
     return render(request, 'songs/favorites.html', {'page_obj': page_obj})
+#
+#
+# @login_required
+# def is_fan(obj, user) -> bool:
+#     """Проверяет, лайкнул ли `user` `obj`.
+#     """
+#     if not user.is_authenticated:
+#         return False
+#     obj_type = ContentType.objects.get_for_model(obj)
+#     likes = Like.objects.filter(
+#         content_type=obj_type, object_id=obj.id, user=user)
+#     return likes.exists()
+#
+#
+# @login_required
+# def get_fans(obj):
+#     """Получает всех пользователей, которые лайкнули `obj`.
+#     """
+#     obj_type = ContentType.objects.get_for_model(obj)
+#     return User.objects.filter(
+#        likes__content_type=obj_type, likes__object_id=obj.id)

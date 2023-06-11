@@ -1,0 +1,9 @@
+<div class="btn-group text-muted  btn-sm">
+    <a style="text-decoration: none;" href="{{ song.get_likes_url }}"
+        class="like-toggle"
+        data-content-type_id="{{ content_type.id }}"
+        data-object_id="{{ song.id }}" role='button'>
+        {% if request.user in song.get_users_who_liked %}❤️{% else %}🤍{% endif %}
+    </a>
+    <span class="likes-count">{{ song.get_likes_count }}</span>
+</div>

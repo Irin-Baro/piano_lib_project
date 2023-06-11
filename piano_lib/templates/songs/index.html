@@ -8,11 +8,9 @@
 {% block content %}
   {% include 'songs/includes/switcher.html' with index=True %}
   <h1>Главная</h1>
-  {% cache 20 article page_obj.number %}
     {% for song in page_obj %}
       {% include 'songs/includes/article.html' %}
       {% if not forloop.last %}<hr>{% endif %}
     {% endfor %}
     {% include 'songs/includes/paginator.html' %}
-  {% endcache %}
 {% endblock %}
