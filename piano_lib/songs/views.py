@@ -4,6 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http.response import FileResponse
+from django.urls import reverse_lazy
+from django.views.generic.base import TemplateView
 
 from .models import (Author, Song, Category,
                      Comment, Like, SongCountViews)
@@ -132,6 +134,7 @@ def delete_comment(request, comment_id):
 
 @login_required
 def like_toggle(request, content_type_id, object_id):
+    """Функция добавления/удаления лайков."""
     content_type = ContentType.objects.get_for_id(content_type_id)
     obj = get_object_or_404(content_type.model_class(), id=object_id)
     like, created = Like.objects.get_or_create(
@@ -158,6 +161,33 @@ def favorites_index(request):
         request.GET.get('page')
     )
     return render(request, 'songs/favorites.html', {'page_obj': page_obj})
+
+
+class AllCategoryView(TemplateView):
+    """Страница всех категорий."""
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['categories'] = Category.objects.all()
+        context['category_all_url'] = reverse_lazy('songs:category_all')
+        return context
+
+
+class AllSongsView(TemplateView):
+    """Страница всех песен."""
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['songs'] = Song.objects.select_related('author', 'category')
+        context['songs_all_url'] = reverse_lazy('songs:songs_all')
+        return context
+
+
+class AllAuthorsView(TemplateView):
+    """Страница всех авторов."""
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['authors'] = Author.objects.all()
+        context['authors_all_url'] = reverse_lazy('songs:authors_all')
+        return context
 #
 #
 # @login_required

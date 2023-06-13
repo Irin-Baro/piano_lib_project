@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Все категории{% endblock %}
+
+{% block content %}
+  <h1>Все категории</h1>
+  <p>
+    {% for song in songs %} 
+    <a href="{% url 'songs:song_detail' song.id %}">{{ song.song_title }}</a>
+      <br>
+    {% endfor %}
+  </p>
+{% endblock %}
