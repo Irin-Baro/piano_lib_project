@@ -27,6 +27,7 @@ class Category(models.Model):
     )
 
     class Meta:
+        ordering = ('category_title',)
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
@@ -55,6 +56,7 @@ class Author(models.Model):
     )
 
     class Meta:
+        ordering = ('author_name',)
         verbose_name = 'Автор'
         verbose_name_plural = 'Авторы'
 
@@ -91,6 +93,49 @@ class Like(models.Model):
         verbose_name_plural = 'Избранные'
 
 
+class Video(models.Model):
+    """Модель ссылки на видео."""
+    video_title = models.CharField(
+        max_length=200,
+        verbose_name='Название видео',
+        help_text='Укажите название видео'
+    )
+    link = models.URLField(
+        verbose_name='Ссылка на видео',
+        help_text='Укажите cсылку на видео'
+    )
+
+    class Meta:
+        ordering = ('video_title',)
+        verbose_name = 'Видео'
+        verbose_name_plural = 'Видео'
+
+    def __str__(self):
+        return self.video_title
+
+
+class File(models.Model):
+    """Модель файла песни."""
+    file_title = models.CharField(
+        max_length=200,
+        verbose_name='Название файла',
+        help_text='Укажите название файла'
+    )
+    file = models.FileField(
+        verbose_name='Файл песни',
+        help_text='Загрузите файл песни',
+        upload_to='songs/'
+    )
+
+    class Meta:
+        ordering = ('file_title',)
+        verbose_name = 'Файл'
+        verbose_name_plural = 'Файлы'
+
+    def __str__(self):
+        return self.file_title
+
+
 class Song(models.Model):
     """Модель песни."""
     song_title = models.CharField(
@@ -110,21 +155,25 @@ class Song(models.Model):
         null=True,
         related_name='songs',
         verbose_name='Автор песни',
-        help_text='Укажите имя автора песни'
+        help_text='Выберите имя автора песни'
     )
-    category = models.ForeignKey(
+    categories = models.ManyToManyField(
         Category,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
         related_name='songs',
-        verbose_name='Категория',
-        help_text='Укажите название категории'
+        verbose_name='Категории',
+        help_text='Выберите категории песни',
+        blank=True
     )
-    song_file = models.FileField(
-        verbose_name='Файл песни',
-        help_text='Загрузите файл песни',
-        upload_to='songs/',
+    files = models.ManyToManyField(
+        File,
+        verbose_name='Файлы',
+        help_text='Выберите файлы песни',
+        blank=True
+    )
+    videos = models.ManyToManyField(
+        Video,
+        verbose_name='Видео',
+        help_text='Выберите видео',
         blank=True
     )
     description = models.TextField(
@@ -139,7 +188,7 @@ class Song(models.Model):
     likes = GenericRelation(Like)
 
     class Meta:
-        ordering = ('-pub_date',)
+        ordering = ('song_title',)
         verbose_name = 'Песня'
         verbose_name_plural = 'Песни'
 

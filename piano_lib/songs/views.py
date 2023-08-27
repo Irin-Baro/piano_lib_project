@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
 
 from .models import (Author, Song, Category,
-                     Comment, Like, SongCountViews)
+                     Comment, Like, SongCountViews)  # SongCategory,
 from .forms import CommentForm
 
 
@@ -20,7 +20,7 @@ def paginator(queryset, page_number):
 def index(request):
     """Главная страница"""
     page_obj = paginator(
-        Song.objects.select_related('author', 'category'),
+        Song.objects.select_related('author').prefetch_related('categories'),
         request.GET.get('page')
     )
     context = {
@@ -32,12 +32,14 @@ def index(request):
 def category_list(request, slug):
     """Страница категории"""
     category = get_object_or_404(Category, slug=slug)
+    songs = Song.objects.filter(categories=category)
     page_obj = paginator(
-        category.songs.select_related('author'), request.GET.get('page')
+        songs,
+        request.GET.get('page')
     )
     context = {
         'page_obj': page_obj,
-        'category': category,
+        'category': category
     }
     return render(request, 'songs/category_list.html', context)
 
@@ -46,7 +48,8 @@ def profile(request, author_id):
     """Страница автора"""
     author = get_object_or_404(Author, id=author_id)
     page_obj = paginator(
-        author.songs.select_related('category'), request.GET.get('page')
+        author.songs.select_related('author').prefetch_related('categories'),
+        request.GET.get('page')
     )
     context = {
         'author': author,
@@ -58,7 +61,9 @@ def profile(request, author_id):
 def song_detail(request, song_id):
     """Страница песни"""
     song = get_object_or_404(
-        Song.objects.select_related('author', 'category'), pk=song_id)
+        Song.objects.select_related('author').prefetch_related('categories'),
+        pk=song_id
+    )
     comments = song.comments.select_related('author')
     if not request.session.session_key:
         request.session.save()
@@ -79,15 +84,19 @@ def song_detail(request, song_id):
     return render(request, 'songs/song_detail.html', context)
 
 
+@login_required
 def song_download(request, song_id):
     """Функция загрузки песни"""
     song = get_object_or_404(
-        Song.objects.select_related('author', 'category'), pk=song_id)
-    song_file_path = song.song_file.path
-    response = FileResponse(open(song_file_path, 'rb'),
+        Song.objects.select_related('author').prefetch_related('categories'),
+        pk=song_id
+    )
+    file = song.files.get(id=request.GET.get('file_id'))
+    file_path = file.file.path
+    response = FileResponse(open(file_path, 'rb'),
                             content_type='application/pdf')
-    response['Content-Disposition'] = ('inline; filename='
-                                       f'"{song.song_title}.pdf"')
+    response['Content-Disposition'] = ('attachment; filename='
+                                       f'"{file.file_title}.pdf"')
     return response
 
 
@@ -95,7 +104,9 @@ def song_download(request, song_id):
 def add_comment(request, song_id):
     """Страница добавления комментария"""
     song = get_object_or_404(
-        Song.objects.select_related('author', 'category'), pk=song_id)
+        Song.objects.select_related('author').prefetch_related('categories'),
+        pk=song_id
+    )
     form = CommentForm(request.POST or None)
     if form.is_valid():
         comment = form.save(commit=False)
@@ -176,7 +187,8 @@ class AllSongsView(TemplateView):
     """Страница всех песен."""
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['songs'] = Song.objects.select_related('author', 'category')
+        context['songs'] = Song.objects.select_related(
+            'author').prefetch_related('categories')
         context['songs_all_url'] = reverse_lazy('songs:songs_all')
         return context
 

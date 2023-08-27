@@ -5,13 +5,16 @@
 {% endblock %}
 
 {% block content %} 
-  <div class="mb-5">     
-    <h1>Все песни автора {{ author.author_name }} </h1>
+<div class="row">
+  <div class="col-6">
+    <h1>{{ author.author_name }}</h1>
     <h4>Всего песен: {{ author.songs.count }}</h4>
     <h6>{{ author.description }}</h6>
-    {% include 'songs/includes/image.html'%}
-   
   </div>
+  <div class="col-6">
+    {% include 'songs/includes/image.html'%}
+  </div>
+</div>
   {% for song in page_obj %}
     {% include 'songs/includes/article.html' with profile=True %}
     {% if not forloop.last %}<hr>{% endif %}

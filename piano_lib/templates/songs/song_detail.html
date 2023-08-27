@@ -15,16 +15,20 @@
           </a>
          
         </li>
-        <li class="list-group-item">
+        <!--li class="list-group-item">
           Дата публикации: {{ song.pub_date|date:"d E Y" }}
-        </li>
+        </li-->
 
-        {% if song.category and not category %}  
+        {% if song.categories.exists %}  
         <li class="list-group-item">
           Категория: 
-          <a href="{% url 'songs:category_list' song.category.slug %}">
-            {{ song.category.category_title }}
-          </a>
+          <ul>
+            {% for category in song.categories.all %}
+            <li><a href="{% url 'songs:category_list' category.slug %}">
+                  {{ category.category_title }}
+                </a> </li>
+            {% endfor %}
+          </ul>
         </li>
         {% endif %}
 
@@ -43,11 +47,33 @@
       <h3>{{ song.song_title }}</h3>
       <p>{{ song.description }}</p>
 
-      Скачать PDF: <a href="{% url 'songs:song_download' song.id %}">
-        {{ song.song_title }}
-      </a>
-        
-    </article>    
+
+      {% for video in song.videos.all %}<br>
+        {{ song.author }} "{{ video.video_title }}"<br>
+        <a>
+          <iframe width="560"
+          height="315"
+          src="{{ video.link }}"
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+          </iframe>
+        </a>
+      {% endfor %}
+      <br>
+
+      {% if song.files.exists %}
+        Скачать ноты PDF:
+        {% for file in song.files.all %}
+        <li>
+          <a href="{% url 'songs:song_download' song.id %}?file_id={{ file.id }} " target="_blank">
+          {{ file.file_title }}
+          </a></li>
+        {% endfor %}
+      {% endif %}
+    </article>  
+
     {% include 'songs/includes/song_counters.html' with song_detail=True %}
     {% include 'songs/includes/comment.html' %}
   </div>

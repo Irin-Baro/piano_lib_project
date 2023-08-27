@@ -3,7 +3,7 @@
 {% block title %}Все категории{% endblock %}
 
 {% block content %}
-  <h1>Все категории</h1>
+  <h1>Все авторы</h1>
   <p>
     {% for author in authors %} 
     <a href="{% url 'songs:profile' author.id %}">{{ author }}</a>
