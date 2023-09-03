@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -8,17 +9,18 @@ from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
 
 from .models import (Author, Song, Category,
-                     Comment, Like, SongCountViews)  # SongCategory,
+                     Comment, Like, SongCountViews)
 from .forms import CommentForm
 
 
 def paginator(queryset, page_number):
+    """Функция пагинатора."""
     paginator = Paginator(queryset, settings.SONGS_PER_PAGE)
     return paginator.get_page(page_number)
 
 
 def index(request):
-    """Главная страница"""
+    """Главная страница."""
     page_obj = paginator(
         Song.objects.select_related('author').prefetch_related('categories'),
         request.GET.get('page')
@@ -30,7 +32,7 @@ def index(request):
 
 
 def category_list(request, slug):
-    """Страница категории"""
+    """Страница категории."""
     category = get_object_or_404(Category, slug=slug)
     songs = Song.objects.filter(categories=category)
     page_obj = paginator(
@@ -45,7 +47,7 @@ def category_list(request, slug):
 
 
 def profile(request, author_id):
-    """Страница автора"""
+    """Страница автора."""
     author = get_object_or_404(Author, id=author_id)
     page_obj = paginator(
         author.songs.select_related('author').prefetch_related('categories'),
@@ -59,7 +61,7 @@ def profile(request, author_id):
 
 
 def song_detail(request, song_id):
-    """Страница песни"""
+    """Страница песни."""
     song = get_object_or_404(
         Song.objects.select_related('author').prefetch_related('categories'),
         pk=song_id
@@ -79,14 +81,44 @@ def song_detail(request, song_id):
     context = {
         'song': song,
         'comments': comments,
-        'form': CommentForm(),
+        'form': CommentForm()
     }
     return render(request, 'songs/song_detail.html', context)
 
 
 @login_required
+def song_difficulty(request, song_id, difficulty):
+    """Страница сложности песни."""
+    song = get_object_or_404(
+        Song.objects
+        .select_related('author')
+        .prefetch_related('categories', 'files', 'videos'),
+        pk=song_id
+    )
+    comments = song.comments.select_related('author')
+    if not request.session.session_key:
+        request.session.save()
+    session_key = request.session.session_key
+    is_views = SongCountViews.objects.filter(songId=song.id, sesId=session_key)
+    if is_views.count() == 0 and str(session_key) != 'None':
+        views = SongCountViews()
+        views.sesId = session_key
+        views.songId = song
+        views.save()
+        song.count_views += 1
+        song.save()
+    context = {
+        'song': song,
+        'comments': comments,
+        'form': CommentForm(),
+        'difficulty': difficulty
+    }
+    return render(request, 'songs/song_difficulty.html', context)
+
+
+@login_required
 def song_download(request, song_id):
-    """Функция загрузки песни"""
+    """Функция загрузки песни."""
     song = get_object_or_404(
         Song.objects.select_related('author').prefetch_related('categories'),
         pk=song_id
@@ -102,7 +134,7 @@ def song_download(request, song_id):
 
 @login_required
 def add_comment(request, song_id):
-    """Страница добавления комментария"""
+    """Страница добавления комментария."""
     song = get_object_or_404(
         Song.objects.select_related('author').prefetch_related('categories'),
         pk=song_id
@@ -113,21 +145,26 @@ def add_comment(request, song_id):
         comment.author = request.user
         comment.song = song
         comment.save()
-    return redirect('songs:song_detail', song_id=song_id)
+    return redirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
 def comment_edit(request, comment_id):
-    """Страница для редактирования комментария"""
+    """Страница для редактирования комментария."""
     comment = get_object_or_404(
         Comment.objects.select_related('author'), pk=comment_id
     )
     if comment.author == request.user:
-        form = CommentForm(request.POST or None,
-                           instance=comment)
-        if form.is_valid():
-            form.save()
-            return redirect('songs:song_detail', comment.song.pk)
+        if request.method == 'POST':
+            form = CommentForm(request.POST, instance=comment)
+            if form.is_valid():
+                form.save()
+                previous_url = request.session.get('previous_url', '/')
+                return HttpResponseRedirect(previous_url)
+        else:
+            form = CommentForm(instance=comment)
+        # Сохранение предыдущего URL-адреса в сессии
+        request.session['previous_url'] = request.META.get('HTTP_REFERER')
         return render(request,
                       'songs/includes/comment_edit.html',
                       {'form': form})
@@ -136,11 +173,11 @@ def comment_edit(request, comment_id):
 
 @login_required
 def delete_comment(request, comment_id):
-    """Страница для удаления комментария"""
+    """Страница для удаления комментария."""
     comment = get_object_or_404(Comment, pk=comment_id)
     if comment.author == request.user:
         comment.delete()
-    return redirect('songs:song_detail', song_id=comment.song.pk)
+    return redirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
@@ -166,7 +203,7 @@ def like_toggle(request, content_type_id, object_id):
 
 @login_required
 def favorites_index(request):
-    """Страница избранных песен"""
+    """Страница избранных песен."""
     page_obj = paginator(
         Song.objects.filter(likes__user=request.user, likes__liked=True),
         request.GET.get('page')

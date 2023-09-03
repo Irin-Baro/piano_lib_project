@@ -34,6 +34,11 @@ urlpatterns = [
          views.song_download,
          name='song_download'),
     path(
+        'songs/<int:song_id>/<str:difficulty>/',
+        views.song_difficulty,
+        name='song_difficulty'
+    ),
+    path(
         'category/',
         views.AllCategoryView.as_view(template_name='songs/category_all.html'),
         name='category_all'),

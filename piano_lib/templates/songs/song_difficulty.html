@@ -13,11 +13,7 @@
           Автор: <a href="{% url 'songs:profile' song.author_id %}">
             {{ song.author }}
           </a>
-         
         </li>
-        <!--li class="list-group-item">
-          Дата публикации: {{ song.pub_date|date:"d E Y" }}
-        </li-->
 
         {% if song.categories.exists %}  
         <li class="list-group-item">
@@ -32,9 +28,6 @@
         </li>
         {% endif %}
 
-        <!--li class="list-group-item d-flex justify-content-between align-items-center">
-          Всего песен автора: {{ song.author.songs.count }}
-        </li-->
         <li class="list-group-item">
           <a href="{% url 'songs:profile' song.author_id %}">
             Все песни автора {{ song.author_name }}</a>: {{ song.author.songs.count }}
@@ -43,18 +36,44 @@
       </ul>
     </aside>
 
-
     <article class="col-12 col-md-9">
       <h3>{{ song.song_title }}</h3>
-      
-      {% include 'songs/includes/difficulty_switcher.html' %}
-      <p>{{ song.description }}</p>
 
+      {% include 'songs/includes/difficulty_switcher.html' %}
+
+      {% for video in song.videos.all %}<br>
+       {% if video.difficulty == difficulty %}
+        {{ song.author }} "{{ video.video_title }}" ({{ video.get_difficulty_display }})<br>
+        <a>
+          <iframe width="560"
+          height="315"
+          src="{{ video.link }}"
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+          </iframe>
+        </a>
+        {% endif %}
+      {% endfor %}
+      <br>
+
+      {% if song.files.exists %}
+        Скачать ноты PDF:
+        {% for file in song.files.all %}
+          {% if file.difficulty == difficulty %}
+        <li>
+          <a href="{% url 'songs:song_download' song.id %}?file_id={{ file.id }} " target="_blank">
+          {{ file.file_title }} ({{ file.get_difficulty_display }})
+          </a></li>
+          {% endif %}
+          {% endfor %}
+      {% endif %}
     </article>  
 
-    {% include 'songs/includes/song_counters.html' with song_detail=True %}
+    {% include 'songs/includes/song_counters.html' with song_difficulty=True %}
 
-    {% if user.is_authenticated %}
+  {% if user.is_authenticated %}
      {% include 'songs/includes/comment.html' %}
     {% else %}
      <p><a href="{% url 'users:login' %}">Авторизуйтесь</a>, чтобы оставить комментарий!💬</p>

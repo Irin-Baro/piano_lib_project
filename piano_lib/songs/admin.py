@@ -12,14 +12,16 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(File)
 class FileAdmin(admin.ModelAdmin):
-    list_display = ('file_title', 'file')
+    list_display = ('file_title', 'file', 'difficulty')
+    list_editable = ('difficulty',)
     search_fields = ('file_title',)
     empty_value_display = '-пусто-'
 
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
-    list_display = ('video_title', 'link')
+    list_display = ('video_title', 'link', 'difficulty')
+    list_editable = ('difficulty',)
     search_fields = ('video_title',)
     empty_value_display = '-пусто-'
 

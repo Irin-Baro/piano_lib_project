@@ -8,6 +8,13 @@ from django.urls import reverse
 User = get_user_model()
 
 
+CHOICES = (
+    ('easy', 'легкая версия'),
+    ('medium', 'удобное переложение'),
+    ('hard', 'для опытных музыкантов')
+)
+
+
 class Category(models.Model):
     """Модель категории."""
     category_title = models.CharField(
@@ -104,6 +111,14 @@ class Video(models.Model):
         verbose_name='Ссылка на видео',
         help_text='Укажите cсылку на видео'
     )
+    difficulty = models.CharField(
+        max_length=16,
+        choices=CHOICES,
+        null=True,
+        blank=True,
+        verbose_name='Сложность',
+        help_text='Выберите сложность'
+    )
 
     class Meta:
         ordering = ('video_title',)
@@ -125,6 +140,14 @@ class File(models.Model):
         verbose_name='Файл песни',
         help_text='Загрузите файл песни',
         upload_to='songs/'
+    )
+    difficulty = models.CharField(
+        max_length=16,
+        choices=CHOICES,
+        null=True,
+        blank=True,
+        verbose_name='Сложность',
+        help_text='Выберите сложность'
     )
 
     class Meta:

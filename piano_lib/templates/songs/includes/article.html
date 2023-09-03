@@ -1,11 +1,14 @@
 <article>
   <div class="shadow-sm p-3 bg-white">
+
+
+    
+<h5><a href="{% url 'songs:song_detail' song.id %}">{{ song.author }} - <strong>{{ song.song_title }}</strong></a></h5>
+
   <ul>
-
-
     {% if not profile %}
     <li>
-      Автор: <b>{{ song.author.get_full_name }}</b>
+      Автор: <!--b>{{ song.author.get_full_name }}</b-->
       <a href="{% url 'songs:profile' song.author_id %}">{{ song.author }}</a>
     </li>
     {% endif %}
@@ -25,9 +28,6 @@
       </ul>
     {% endif %}
   </ul>
-
-  <strong>{{ song.song_title }}</strong>
-  <a href="{% url 'songs:song_detail' song.id %}">подробнее</a>
  
   {% include 'songs/includes/song_counters.html' %}
 </div>

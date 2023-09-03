@@ -11,7 +11,7 @@
         </div>
 
         <div class="btn-group text-muted  btn-sm ">
-          <a class="nav-link" href="{% url 'songs:add_comment' song.id %}">💬 {{ song.comments.count }}</a>
+          <a class="nav-link" href="{% url 'songs:song_detail' song.id %}">💬 {{ song.comments.count }}</a>
         </div>
       </div> 
     </div>

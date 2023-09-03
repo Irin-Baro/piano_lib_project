@@ -42,13 +42,12 @@
 {% endfor %}
 
 {% if user.is_authenticated %}
-{% if request.resolver_match.view_name == 'songs:comment_edit' %} 
-   {% include 'songs/includes/comment_edit.html' %}  
-{% else %}
-   {% with card_header='Добавить комментарий:' button='Добавить комментарий' %}
-     <form method="post" action="{% url 'songs:add_comment' song.id %}">
-     {% include 'includes/form.html' %}
+  {% if request.resolver_match.view_name == 'songs:comment_edit' %} 
+    {% include 'songs/includes/comment_edit.html' %}  
+  {% else %}
+    {% with card_header='Добавить комментарий:' button='Добавить комментарий' %}
+      <form method="post" action="{% url 'songs:add_comment' song.id %}">
+      {% include 'includes/form.html' %}
     {% endwith %}
+  {% endif %}
 {% endif %}
-{% endif %}
-
