@@ -147,3 +147,8 @@ dmypy.json
 
 # папки со статикой и медиа
 static/
+media/
+piano_lib/media/
+piano_lib/media/songs/
+piano_lib/media/pictures/
+piano_lib/media/cache/
