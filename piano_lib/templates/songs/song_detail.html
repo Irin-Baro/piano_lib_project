@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
 
 {% block title %}
  {{ song_title|truncatechars:30 }}
@@ -48,8 +49,11 @@
       <h3>{{ song.song_title }}</h3>
       
       {% include 'songs/includes/difficulty_switcher.html' %}
-      <p>{{ song.description }}</p>
+      <div class="col-6">
+        {% include 'songs/includes/image.html' %}
+      </div>
 
+      <p>{{ song.description }}</p>
     </article>  
 
     {% include 'songs/includes/song_counters.html' with song_detail=True %}

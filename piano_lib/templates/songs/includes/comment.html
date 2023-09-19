@@ -28,10 +28,10 @@
              
             {% if request.user == comment.author %}
               <a class="btn btn-primary" href="{% url 'songs:delete_comment' comment.pk %}">
-                Удалить комментарий
+                Удалить
               </a>
               <a class="btn btn-primary" href="{% url 'songs:comment_edit' comment.pk %}">
-                Редактировать комментарий
+                Редактировать
               </a>
             {% endif %}                      
           </div>  

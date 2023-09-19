@@ -57,7 +57,7 @@ class Author(models.Model):
     image = models.ImageField(
         verbose_name='Изображение',
         help_text='Загрузите изображение',
-        upload_to='pictures/',
+        upload_to='pictures/authors/',
         blank=True,
         null=True
     )
@@ -203,6 +203,13 @@ class Song(models.Model):
         blank=True,
         verbose_name='Информация о песни',
         help_text='Укажите информацию о песни'
+    )
+    image = models.ImageField(
+        verbose_name='Изображение',
+        help_text='Загрузите изображение',
+        upload_to='pictures/songs/',
+        blank=True,
+        null=True
     )
     count_views = models.PositiveIntegerField(
         default=0,

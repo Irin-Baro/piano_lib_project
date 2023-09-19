@@ -11,9 +11,6 @@
     <h4>Всего песен: {{ author.songs.count }}</h4>
     <h6>{{ author.description }}</h6>
   </div>
-  <div class="col-6">
-    {% include 'songs/includes/image.html'%}
-  </div>
 </div>
   {% for song in page_obj %}
     {% include 'songs/includes/article.html' with profile=True %}

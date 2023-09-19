@@ -1,9 +1,10 @@
 <article>
   <div class="shadow-sm p-3 bg-white">
 
-
-    
 <h5><a href="{% url 'songs:song_detail' song.id %}">{{ song.author }} - <strong>{{ song.song_title }}</strong></a></h5>
+<div class="col-6">
+  {% include 'songs/includes/image.html' %}
+</div>
 
   <ul>
     {% if not profile %}

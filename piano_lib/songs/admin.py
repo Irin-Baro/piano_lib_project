@@ -22,7 +22,7 @@ class FileAdmin(admin.ModelAdmin):
 class VideoAdmin(admin.ModelAdmin):
     list_display = ('video_title', 'link', 'difficulty')
     list_editable = ('difficulty',)
-    search_fields = ('video_title',)
+    # search_fields = ('video_title',)
     empty_value_display = '-пусто-'
 
 
@@ -36,11 +36,12 @@ class SongAdmin(admin.ModelAdmin):
         'display_videos',
         'display_categories',
         'description',
+        'image',
         'pub_date',
     )
     filter_horizontal = ('categories', 'files', 'videos')
-    list_editable = ('author', 'song_title', 'description')
-    search_fields = ('song_title', 'author__author_name', 'pub_date')
+    list_editable = ('author', 'song_title', 'description', 'image',)
+    # search_fields = ('song_title', 'author__author_name', 'pub_date')
     list_filter = ('song_title', 'pub_date', 'author', 'categories')
     empty_value_display = '-пусто-'
 
@@ -64,7 +65,7 @@ class SongAdmin(admin.ModelAdmin):
 class Author(admin.ModelAdmin):
     list_display = ('id', 'author_name', 'image', 'description')
     list_editable = ('author_name', 'image', 'description')
-    search_fields = ('author_name',)
+    # search_fields = ('author_name',)
     list_filter = ('author_name',)
     empty_value_display = '-пусто-'
 

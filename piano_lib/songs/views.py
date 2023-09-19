@@ -86,7 +86,6 @@ def song_detail(request, song_id):
     return render(request, 'songs/song_detail.html', context)
 
 
-@login_required
 def song_difficulty(request, song_id, difficulty):
     """Страница сложности песни."""
     song = get_object_or_404(
@@ -116,7 +115,6 @@ def song_difficulty(request, song_id, difficulty):
     return render(request, 'songs/song_difficulty.html', context)
 
 
-@login_required
 def song_download(request, song_id):
     """Функция загрузки песни."""
     song = get_object_or_404(
@@ -132,7 +130,6 @@ def song_download(request, song_id):
     return response
 
 
-@login_required
 def add_comment(request, song_id):
     """Страница добавления комментария."""
     song = get_object_or_404(
@@ -148,7 +145,6 @@ def add_comment(request, song_id):
     return redirect(request.META.get('HTTP_REFERER'))
 
 
-@login_required
 def comment_edit(request, comment_id):
     """Страница для редактирования комментария."""
     comment = get_object_or_404(
@@ -171,7 +167,6 @@ def comment_edit(request, comment_id):
     return redirect('songs:song_detail', song_id=comment.song.pk)
 
 
-@login_required
 def delete_comment(request, comment_id):
     """Страница для удаления комментария."""
     comment = get_object_or_404(Comment, pk=comment_id)
