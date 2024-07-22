@@ -4,6 +4,7 @@ from django.contrib.contenttypes.fields import (GenericRelation,
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
+from PIL import Image
 
 User = get_user_model()
 
@@ -48,7 +49,7 @@ class Author(models.Model):
         max_length=200,
         verbose_name='Автор',
         help_text='Укажите автора'
-        )
+    )
     description = models.TextField(
         blank=True,
         verbose_name='Об авторе',
@@ -100,65 +101,6 @@ class Like(models.Model):
         verbose_name_plural = 'Избранные'
 
 
-class Video(models.Model):
-    """Модель ссылки на видео."""
-    video_title = models.CharField(
-        max_length=200,
-        verbose_name='Название видео',
-        help_text='Укажите название видео'
-    )
-    link = models.URLField(
-        verbose_name='Ссылка на видео',
-        help_text='Укажите cсылку на видео'
-    )
-    difficulty = models.CharField(
-        max_length=16,
-        choices=CHOICES,
-        null=True,
-        blank=True,
-        verbose_name='Сложность',
-        help_text='Выберите сложность'
-    )
-
-    class Meta:
-        ordering = ('video_title',)
-        verbose_name = 'Видео'
-        verbose_name_plural = 'Видео'
-
-    def __str__(self):
-        return self.video_title
-
-
-class File(models.Model):
-    """Модель файла песни."""
-    file_title = models.CharField(
-        max_length=200,
-        verbose_name='Название файла',
-        help_text='Укажите название файла'
-    )
-    file = models.FileField(
-        verbose_name='Файл песни',
-        help_text='Загрузите файл песни',
-        upload_to='songs/'
-    )
-    difficulty = models.CharField(
-        max_length=16,
-        choices=CHOICES,
-        null=True,
-        blank=True,
-        verbose_name='Сложность',
-        help_text='Выберите сложность'
-    )
-
-    class Meta:
-        ordering = ('file_title',)
-        verbose_name = 'Файл'
-        verbose_name_plural = 'Файлы'
-
-    def __str__(self):
-        return self.file_title
-
-
 class Song(models.Model):
     """Модель песни."""
     song_title = models.CharField(
@@ -185,18 +127,6 @@ class Song(models.Model):
         related_name='songs',
         verbose_name='Категории',
         help_text='Выберите категории песни',
-        blank=True
-    )
-    files = models.ManyToManyField(
-        File,
-        verbose_name='Файлы',
-        help_text='Выберите файлы песни',
-        blank=True
-    )
-    videos = models.ManyToManyField(
-        Video,
-        verbose_name='Видео',
-        help_text='Выберите видео',
         blank=True
     )
     description = models.TextField(
@@ -246,6 +176,52 @@ class Song(models.Model):
         obj_type = ContentType.objects.get_for_model(self)
         likes = Like.objects.filter(content_type=obj_type, object_id=self.id)
         return [like.user for like in likes if like.liked]
+
+    def save_image(self):
+        super().save()
+
+        img = Image.open(self.image.path)
+        max_size = (300, 300)
+        img.thumbnail(max_size, Image.ANTIALIAS)
+        img.save(self.image.path, 'JPEG')
+
+
+class SongFile(models.Model):
+    """Модель связи между песней и файлом."""
+    song = models.ForeignKey(
+        Song,
+        on_delete=models.CASCADE,
+        related_name='songfiles',
+        verbose_name='Песня',
+        help_text='Укажите песню',
+    )
+    file = models.FileField(
+        verbose_name='Файл песни',
+        help_text='Загрузите файл песни',
+        upload_to='songs/'
+    )
+    difficulty = models.CharField(
+        max_length=16,
+        choices=CHOICES,
+        null=True,
+        blank=True,
+        verbose_name='Сложность',
+        help_text='Выберите сложность'
+    )
+    video = models.URLField(
+        verbose_name='Ссылка на видео',
+        help_text='Укажите cсылку на видео',
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        # ordering = ('file_title',)
+        verbose_name = 'Файл'
+        verbose_name_plural = 'Файлы'
+
+    def __str__(self):
+        return f'{self.song.song_title} {self.difficulty}'
 
 
 class Comment(models.Model):

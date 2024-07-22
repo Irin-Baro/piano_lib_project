@@ -40,36 +40,23 @@
       <h3>{{ song.song_title }}</h3>
 
       {% include 'songs/includes/difficulty_switcher.html' %}
-
-      {% for video in song.videos.all %}<br>
-       {% if video.difficulty == difficulty %}
-        {{ song.author }} "{{ video.video_title }}" ({{ video.get_difficulty_display }})<br>
-        <a>
-          <iframe width="560"
-          height="315"
-          src="{{ video.link }}"
-          title="YouTube video player"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen>
-          </iframe>
-        </a>
-        {% endif %}
-      {% endfor %}
-      <br>
-
-      {% if song.files.exists %}
-        Скачать ноты PDF:
-        {% for file in song.files.all %}
-          {% if file.difficulty == difficulty %}
-        <li>
-          <a href="{% url 'songs:song_download' song.id %}?file_id={{ file.id }} " target="_blank">
-          {{ file.file_title }} ({{ file.get_difficulty_display }})
-          </a></li>
+      
+      {% if song.songfiles.exists %}
+        {% for song_file in song.songfiles.all %}
+          {% if song_file.difficulty == difficulty %}
+            {{ song.author }} "{{ song.song_title }}" ({{ song_file.get_difficulty_display }})<br><br>
+            {% if song_file.video != None %}
+            {% include 'songs/includes/video_link.html' %}
+            {% endif %}
           {% endif %}
-          {% endfor %}
+        {% endfor %}
+          <br>
+          <br>
+          {% include 'songs/includes/song_download.html' %}
+          
       {% endif %}
-    </article>  
+      <br>
+      <br>
 
     {% include 'songs/includes/song_counters.html' with song_difficulty=True %}
 

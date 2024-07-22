@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,6 +22,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'songs.apps.SongsConfig',
     'users.apps.UsersConfig',
+    'store.apps.StoreConfig',
     'core.apps.CoreConfig',
     'about.apps.AboutConfig',
     'sorl.thumbnail',
@@ -61,12 +61,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'piano_lib.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DATABASE_NAME', 'piano_lib_db'),
+            'USER': os.getenv('DATABASE_USER', 'piano_lib_user'),
+            'PASSWORD': os.getenv('DATABASE_PASSWORD', 'piano_lib_pass'),
+            'HOST': os.getenv('DATABASE_HOST', 'db'),
+            'PORT': os.getenv('DATABASE_PORT', 5432),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -97,24 +110,29 @@ SONGS_PER_PAGE = 10
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = BASE_DIR / 'static'
-
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = '/var/www/piano_lib/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 LOGIN_URL = 'users:login'
 
 LOGIN_REDIRECT_URL = 'songs:index'
 
-# LOGOUT_REDIRECT_URL = 'songs:index'
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.example.com')
+    EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'your_email@example.com')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
@@ -124,5 +142,5 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
-
-CACH_TIME: int = 20
+#
+# CACH_TIME: int = 20

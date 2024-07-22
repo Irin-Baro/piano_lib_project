@@ -9,7 +9,7 @@ from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
 
 from .models import (Author, Song, Category,
-                     Comment, Like, SongCountViews)
+                     Comment, Like, SongCountViews, SongFile)
 from .forms import CommentForm
 
 
@@ -91,7 +91,7 @@ def song_difficulty(request, song_id, difficulty):
     song = get_object_or_404(
         Song.objects
         .select_related('author')
-        .prefetch_related('categories', 'files', 'videos'),
+        .prefetch_related('categories'),
         pk=song_id
     )
     comments = song.comments.select_related('author')
@@ -110,23 +110,23 @@ def song_difficulty(request, song_id, difficulty):
         'song': song,
         'comments': comments,
         'form': CommentForm(),
-        'difficulty': difficulty
+        'difficulty': difficulty,
     }
     return render(request, 'songs/song_difficulty.html', context)
 
 
-def song_download(request, song_id):
+def song_download(request, song_id, difficulty):
     """Функция загрузки песни."""
     song = get_object_or_404(
         Song.objects.select_related('author').prefetch_related('categories'),
         pk=song_id
     )
-    file = song.files.get(id=request.GET.get('file_id'))
-    file_path = file.file.path
+    song_file = get_object_or_404(SongFile, difficulty=difficulty, song=song)
+    file_path = song_file.file.path
     response = FileResponse(open(file_path, 'rb'),
                             content_type='application/pdf')
     response['Content-Disposition'] = ('attachment; filename='
-                                       f'"{file.file_title}.pdf"')
+                                       f'"{song_file.file.name}.pdf"')
     return response
 
 

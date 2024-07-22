@@ -1,0 +1,43 @@
+version: '3.8'
+volumes:
+  postgres_data:
+    driver: local
+  static:
+  media:
+
+services:
+  db:
+    image: postgres:13
+    env_file: 
+      - ./piano_lib/piano_lib/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: piano_lib_db
+      POSTGRES_USER: piano_lib_user
+      POSTGRES_PASSWORD: piano_lib_pass
+
+  web:
+    build: .
+    env_file: 
+      - ./piano_lib/piano_lib/.env
+    environment:
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_EMAIL: admin@example.com
+      DJANGO_SUPERUSER_PASSWORD: adminpass
+    command: >
+         sh -c
+         "python manage.py migrate &&
+         python manage.py collectstatic --noinput &&
+         cp -r /app/piano_lib/collected_static/. /static/ &&
+         python manage.py add_admin &&
+         python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+      - ./static:/app/static
+      - ./media:/app/media
+    working_dir: /app/piano_lib
+    ports:
+      - "8000:8000"    
+    depends_on:
+      - db

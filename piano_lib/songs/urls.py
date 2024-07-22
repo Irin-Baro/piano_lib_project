@@ -30,7 +30,7 @@ urlpatterns = [
         views.like_toggle,
         name='like_toggle'
     ),
-    path('songs/<int:song_id>/download/',
+    path('songs/<int:song_id>/download/<str:difficulty>/',
          views.song_download,
          name='song_download'),
     path(

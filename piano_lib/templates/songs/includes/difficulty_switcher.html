@@ -1,19 +1,18 @@
 <div class="row my-3">
-    <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <a class="nav-link {% if not difficulty %}active{% endif %}"
-            href="{% url 'songs:song_detail' song.id %}">
-            О песне
-            </a>
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link {% if not difficulty %}active{% endif %}"
+        href="{% url 'songs:song_detail' song.id %}">
+        О песне
+      </a>
+    </li>
+    {% for song_file in song.songfiles.all %}
+    <li class="nav-item">
+      <a class="nav-link {% if difficulty == song_file.difficulty %}active{% endif %}"
+        href="{% url 'songs:song_difficulty' song.id song_file.difficulty %}">
+          {{ song_file.get_difficulty_display }}
+        </a>
         </li>
-
-        {% for file in song.files.all %}
-        <li class="nav-item">
-            <a class="nav-link {% if difficulty == file.difficulty %}active{% endif %}"
-            href="{% url 'songs:song_difficulty' song.id file.difficulty %}">
-            {{ file.get_difficulty_display }}
-            </a>
-        </li>
-        {% endfor %}
-    </ul>
+    {% endfor %}
+  </ul>
 </div>

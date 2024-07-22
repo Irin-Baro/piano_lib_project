@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  Последние обновления на сайте
+  Избранные песни
 {% endblock %}
 
 {% block content %}
 {% include 'songs/includes/switcher.html' with favorites=True %}
+  <h1>Ваши избранные песни</h1>
     {% for song in page_obj %}
       {% include 'songs/includes/article.html' %}
       {% if not forloop.last %}<hr>{% endif %}
