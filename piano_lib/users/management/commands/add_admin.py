@@ -5,12 +5,15 @@ User = get_user_model()
 
 
 class Command(BaseCommand):
-    username = 'admin'
-    password = 'adminpass'
-    user = get_user_model().objects.filter(username=username).first()
-    if not user:
-        get_user_model().objects.create_superuser(
-            username=username,
-            password=password,
-            email=''
-        )
+    """Создание админа"""
+
+    def handle(self, *args, **kwargs):
+        username = 'admin'
+        password = 'adminpass'
+        user = get_user_model().objects.filter(username=username).first()
+        if not user:
+            get_user_model().objects.create_superuser(
+                username=username,
+                password=password,
+                email=''
+            )

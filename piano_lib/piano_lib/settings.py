@@ -66,7 +66,7 @@ if DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': str(BASE_DIR / 'db.sqlite3'),
         }
     }
 else:
@@ -108,9 +108,12 @@ USE_L10N = True
 
 SONGS_PER_PAGE = 10
 
-STATIC_URL = '/static/'
-
-STATIC_ROOT = BASE_DIR / 'collected_static'
+if DEBUG:
+    STATIC_URL = '/static/'
+    STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+else:
+    STATIC_URL = '/static/'
+    STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
 

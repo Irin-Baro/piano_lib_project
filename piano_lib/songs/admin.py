@@ -45,8 +45,7 @@ class SongAdmin(admin.ModelAdmin):
         'pub_date',
     )
     filter_horizontal = ('categories',)
-    list_editable = ('description',
-                     'image',)
+    list_editable = ('description', 'image',)
     search_fields = ('song_title', 'author__author_name')
     list_filter = ('song_title', 'pub_date', 'author', 'categories')
     empty_value_display = '-пусто-'
